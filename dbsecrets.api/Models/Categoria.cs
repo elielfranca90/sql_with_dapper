@@ -1,13 +1,11 @@
 namespace dbsecrets.api.Models
 {
-    public class Produto
+    public class Categoria
     {
         public int Id { get; set; }
-
-        public string? Codigo { get; set; }
-
+        public string? Nome { get; set; }
         public string? Descricao { get; set; }
     }
 
-    public class Produtos : List<Produto> { }
+    public class Categorias : List<Categoria> { }
 }

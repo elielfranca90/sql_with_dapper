@@ -15,7 +15,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 // Redireciona a raiz para o Swagger
-app.MapGet("/", () => Results.Redirect("/swagger"));
+app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
 //}
 
 app.UseHttpsRedirection();
@@ -23,3 +23,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

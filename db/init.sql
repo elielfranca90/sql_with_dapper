@@ -28,3 +28,17 @@ INSERT INTO produto (codigo, descricao) VALUES
 ('CAF018', 'Porta-filtro profissional 58mm'),
 ('CAF019', 'Xícara para café expresso 60ml'),
 ('CAF020', 'Kit barista iniciante');
+
+
+CREATE TABLE if NOT EXISTS categoria(
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
+    descricao VARCHAR(255) NOT NULL
+);
+
+INSERT INTO categoria (nome, descricao) VALUES
+('Café em grãos', 'Café em grãos arábica e robusta'),
+('Café moído', 'Café moído tradicional e gourmet'),
+('Café em cápsulas', 'Café em cápsulas compatível Nespresso e Dolce Gusto'),
+('Máquinas de café', 'Máquinas de café expresso doméstica e profissional'),
+('Acessórios', 'Acessórios para café');

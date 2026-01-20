@@ -69,11 +69,32 @@ namespace dbsecrets.api.Controllers
         [HttpPost("produtos")]
         public async Task<IActionResult> PostProduto(Produto produto)
         {
-            produto ??= new Produto()
+            await using var connection = new NpgsqlConnection(ConnectionString);
+
+            await connection.OpenAsync();
+
+            var query = @"INSERT INTO produto (codigo, descricao) 
+                         VALUES (@Codigo, @Descricao) 
+                         RETURNING id, codigo, descricao;";
+
+            var result = await connection.QuerySingleOrDefaultAsync<Produto>(query, new { produto.Codigo, produto.Descricao });
+
+            await connection.CloseAsync();
+            await connection.DisposeAsync();
+
+            if (result == null)
             {
-                Codigo = "001",
-                Descricao = "Produto 001"
-            };
+                return BadRequest(new { mensagem = "Erro ao criar produto" });
+            }
+
+            return Created($"/produtos/{result.Id}", result);
+        }
+
+        [HttpPost("lista-produtos")]
+        public async Task<IActionResult> PostListaProdutos(List<Produto> produtos)
+        {
+            if (produtos == null || produtos.Count <= 0)
+                return BadRequest(new { mensagem = "Lista de produtos inválida" });
 
             await using var connection = new NpgsqlConnection(ConnectionString);
 
@@ -81,20 +102,27 @@ namespace dbsecrets.api.Controllers
 
             var query = @"INSERT INTO produto (codigo, descricao) 
                          VALUES (@Codigo, @Descricao) 
-                         RETURNING id;";
+                         RETURNING id, codigo, descricao;";
 
-            var id = await connection.QuerySingleOrDefaultAsync<int?>(query, new { produto.Codigo, produto.Descricao });
+            var result = new List<Produto>();
+
+            foreach (var produto in produtos)
+            {
+                var item = await connection.QuerySingleOrDefaultAsync<Produto>(query, new { produto.Codigo, produto.Descricao });
+                if (item != null) result.Add(item);
+            }
 
             await connection.CloseAsync();
             await connection.DisposeAsync();
 
-            if (id == null || id == 0)
+            if (!result.Any())
             {
-                return BadRequest(new { mensagem = "Erro ao criar produto" });
+                return BadRequest(new { mensagem = "Nenhum produto foi criado" });
             }
 
-            return Created($"/produtos/{id}", new { id, codigo = produto.Codigo, descricao = produto.Descricao });
+            return Created($"/produtos", result);
         }
+
 
         [HttpPut("produtos")]
         public async Task<IActionResult> PutProduto(Produto produto)

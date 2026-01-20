@@ -1,0 +1,10 @@
+.git
+.gitignore
+.vs
+.vscode
+bin/
+obj/
+README.md
+Dockerfile*
+docker-compose*
+*.md
